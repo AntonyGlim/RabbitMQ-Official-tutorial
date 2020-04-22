@@ -1,4 +1,4 @@
-package glim.antony.tutorial.hello.world;
+package glim.antony.tutorial1.hello.world;
 
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
