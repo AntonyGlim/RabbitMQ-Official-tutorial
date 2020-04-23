@@ -1,6 +1,9 @@
-package glim.antony.tutorial3.publish.subscribe;
+package glim.antony.tutorial4.routing;
 
-import com.rabbitmq.client.*;
+import com.rabbitmq.client.BuiltinExchangeType;
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.ConnectionFactory;
 
 import java.nio.charset.StandardCharsets;
 
@@ -13,7 +16,7 @@ import java.nio.charset.StandardCharsets;
  */
 public class Producer {
 
-    private static final String EXCHANGE_NAME = "logs";
+    private static final String EXCHANGE_NAME = "direct_logs";
 
     public static void main(String[] args) throws Exception {
         ConnectionFactory factory = new ConnectionFactory();
@@ -22,16 +25,19 @@ public class Producer {
                 Connection connection = factory.newConnection();
                 Channel channel = connection.createChannel();
         ) {
-            channel.exchangeDeclare(EXCHANGE_NAME, BuiltinExchangeType.FANOUT);
+            channel.exchangeDeclare(EXCHANGE_NAME, BuiltinExchangeType.DIRECT);
+            String[] severityArray = {"info", "warning", "error"};
 
             for (int i = 0; i < 10; i++) {
                 String message = "Hello World! " + i;
-                channel.basicPublish(
-                        EXCHANGE_NAME,
-                        "",
-                        null,
-                        message.getBytes(StandardCharsets.UTF_8)
-                );
+                for (String severity : severityArray) {
+                    channel.basicPublish(
+                            EXCHANGE_NAME,
+                            severity,
+                            null,
+                            message.getBytes(StandardCharsets.UTF_8)
+                    );
+                }
                 System.out.println(" [x] Sent '" + message + "'");
             }
         }
